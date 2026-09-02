@@ -3,116 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEO - Indian AI Assistant</title>
+    <title>LEO - Indian AI</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #efeae2; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        
-        /* Header */
-        .header { background: #075e54; color: white; padding: 15px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .header h1 { margin: 0; font-size: 1.4rem; }
-        .header p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.9; }
-
-        /* Chat Window */
-        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 15px; font-size: 1rem; line-height: 1.5; position: relative; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .bot { background: white; align-self: flex-start; border-bottom-left-radius: 0; color: #303030; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .user { background: #dcf8c6; align-self: flex-end; border-bottom-right-radius: 0; color: #303030; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-
-        /* Input Area */
-        .input-area { background: #f0f0f0; padding: 15px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #ddd; }
-        input { flex: 1; border: none; padding: 12px 18px; border-radius: 30px; outline: none; font-size: 1rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        button { background: #075e54; color: white; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.4rem; transition: 0.2s; }
-        button:hover { background: #128c7e; transform: scale(1.05); }
-
-        .typing { font-size: 0.8rem; color: #666; margin-left: 20px; margin-bottom: 10px; display: none; }
+        body { font-family: sans-serif; background-color: #e5ddd5; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #075e54; color: white; padding: 15px; text-align: center; }
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px; border-radius: 10px; line-height: 1.4; }
+        .bot { background: white; align-self: flex-start; }
+        .user { background: #dcf8c6; align-self: flex-end; }
+        .input-area { background: #f0f0f0; padding: 10px; display: flex; gap: 10px; }
+        input { flex: 1; border: none; padding: 10px; border-radius: 20px; outline: none; }
+        button { background: #075e54; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        #typing { display: none; padding-left: 20px; font-size: 12px; color: #555; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>LEO</h1>
-    <p>Created by Ritesh</p>
+    <strong>LEO</strong><br><small>Created by Ritesh</small>
 </div>
 
 <div id="chat-box"></div>
-<div id="typing" class="typing">Leo is thinking...</div>
+<div id="typing">Leo is thinking...</div>
 
 <div class="input-area">
-    <input type="text" id="userInput" placeholder="Type message in English or Hindi...">
-    <button onclick="sendMessage()">➔</button>
+    <input type="text" id="userInput" placeholder="Ask anything...">
+    <button onclick="sendMessage()">Send</button>
 </div>
 
 <script>
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('userInput');
-    const typingIndicator = document.getElementById('typing');
+    const typing = document.getElementById('typing');
 
-    // Enhanced Indian Female Voice Function
+    // Indian Female Voice
     function speak(text) {
-        window.speechSynthesis.cancel(); // Stop any current speech
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = text;
-        
-        // Fetch all available voices
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
         const voices = window.speechSynthesis.getVoices();
-        
-        // Target Indian English or Hindi Female voices specifically
-        const targetVoice = voices.find(v => (v.lang === 'hi-IN' || v.lang === 'en-IN') && v.name.includes('Female')) || 
-                           voices.find(v => v.lang === 'hi-IN') || 
-                           voices.find(v => v.lang === 'en-IN') ||
-                           voices[0];
-
-        msg.voice = targetVoice;
-        msg.pitch = 1.1; // Slightly higher pitch for a friendly female tone
-        msg.rate = 1.0;  // Normal speed
+        // Look for Hindi or Indian English Female
+        const indVoice = voices.find(v => v.lang.includes('hi-IN')) || 
+                         voices.find(v => v.lang.includes('en-IN') && v.name.includes('Female')) ||
+                         voices[0];
+        msg.voice = indVoice;
+        msg.rate = 1.0;
         window.speechSynthesis.speak(msg);
     }
 
-    function addMessage(text, sender) {
-        const div = document.createElement('div');
-        div.className = `msg ${sender}`;
-        div.innerText = text;
-        chatBox.appendChild(div);
+    function addMsg(text, type) {
+        const d = document.createElement('div');
+        d.className = `msg ${type}`;
+        d.innerText = text;
+        chatBox.appendChild(d);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     async function sendMessage() {
-        const text = userInput.value.trim();
-        if (!text) return;
+        const val = userInput.value.trim();
+        if(!val) return;
 
-        addMessage(text, 'user');
+        addMsg(val, 'user');
         userInput.value = '';
-        typingIndicator.style.display = 'block';
+        typing.style.display = 'block';
 
+        // NEW STABLE CONNECTION
         try {
-            // AI Brain (Pollinations) with Ritesh's specific persona instructions
-            const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}?system=Your name is Leo. You were created by Ritesh. You are a friendly Indian assistant. You speak English but with a warm Indian personality. When users ask who made you, always say 'Mujhe Ritesh ne banaya hai'. Keep your answers helpful and polite.`);
+            const systemPrompt = "Your name is Leo. You were made by Ritesh. You are a friendly Indian girl assistant. Talk in English/Hindi mix. Always start by being friendly.";
+            const response = await fetch("https://text.pollinations.ai/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: val }
+                    ],
+                    model: "openai" 
+                })
+            });
+
             const data = await response.text();
-            
-            typingIndicator.style.display = 'none';
-            addMessage(data, 'bot');
+            typing.style.display = 'none';
+            addMsg(data, 'bot');
             speak(data);
-        } catch (error) {
-            typingIndicator.style.display = 'none';
-            addMessage("I'm sorry, I'm having trouble connecting. Check your internet!", 'bot');
+        } catch (e) {
+            typing.style.display = 'none';
+            addMsg("Connection Error. Please check your internet and try again!", 'bot');
         }
     }
 
-    // This runs as soon as the page loads
     window.onload = () => {
-        const introText = "Hello! Mujhe Ritesh ne banaya hai. I am Leo, your friendly assistant. How can I help you today?";
-        addMessage(introText, 'bot');
-        
-        // Browsers block sound until the user clicks something, 
-        // so Leo will speak after the user's first message or a click.
+        const welcome = "Hello! Mujhe Ritesh ne banaya hai. I am Leo, your smart assistant. How can I help you today?";
+        addMsg(welcome, 'bot');
     };
 
-    userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
-    
-    // Pre-load voices for the browser
+    userInput.addEventListener("keypress", (e) => { if(e.key === 'Enter') sendMessage(); });
     window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
 </script>
 
