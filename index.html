@@ -3,135 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEO BY RITESH</title>
+    <title>LEO by Ritesh</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background: #000; color: #fff; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 2px solid #f39c12; }
-        .header h1 { margin: 0; color: #f39c12; font-size: 24px; }
-        #chat-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .bubble { padding: 12px 18px; border-radius: 20px; max-width: 80%; line-height: 1.5; font-size: 16px; }
-        .leo { background: #333; align-self: flex-start; border-bottom-left-radius: 0; color: #f39c12; border: 1px solid #444; }
-        .user { background: #f39c12; align-self: flex-end; border-bottom-right-radius: 0; color: #000; font-weight: bold; }
-        .input-box { background: #1a1a1a; padding: 15px; display: flex; gap: 10px; }
-        input { flex: 1; padding: 15px; border-radius: 30px; border: none; outline: none; font-size: 16px; background: #333; color: #fff; }
-        button { background: #f3I am very sorry that this is being so difficult. I want to help you fix this **once and for all** so you aren't angry anymore.
-
-The reason you are seeing "Connection Error" is because your **Web Browser** is protecting you by blocking the AI from talking to your website (this is called a CORS error). 
-
-To fix this, I have made a **"Master Version"**. This version doesn't use the complicated "JSON" connection that browsers block. It uses a **simple text link** that browsers almost never block.
-
-### The "No-Fail" LEO Code:
-
-Copy this and replace your current `index.html` file on GitHub:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEO - Made by Ritesh</title>
-    <style>
-        body { font-family: sans-serif; background-color: #000; color: #fff; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
-        .header { background: #128C7E; padding: 20px; text-align: center; font-weight: bold; font-size: 24px; border-bottom: 2px solid #075E54; }
-        .creator { font-size: 12px; display: block; color: #dcf8c6; }
-        #chat-window { flex: 1; padding: 15px; overflow-y9c12; color: #000; border: none; padding: 0 25px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b141a; color: white; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #202c33; padding: 15px; text-align: center; border-bottom: 2px solid #00a884; }
+        .header h1 { margin: 0; font-size: 20px; color: #00a884; }
+        .header p { margin: 5px 0 0; font-size: 12px; color: #aebac1; }
+        #chat-window { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-color: #0b141a; }
+        .bubble { max-width: 80%; padding: 12px; border-radius: 10px; font-size: 16px; line-height: 1.4; word-wrap: break-word; }
+        .leo-msg { background: #202c33; align-self: flex-start; color: #e9edef; border-bottom-left-radius: 0; }
+        .user-msg { background: #005c4b; align-self: flex-end; color: white; border-bottom-right-radius: 0; }
+        .input-area { background: #202c33; padding: 15px; display: flex; gap: 10px; }
+        input { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 20px; color: white; outline: none; font-size: 16px; }
+        button { background: #00a884; border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; font-size: 20px; }
+        #typing { font-size: 12px; color: #00a884; padding-left: 15px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>LEO Assistant</h1>
-    <small>Masterpiece by RITESH</small>
+    <h1>LEO</h1>
+    <p>Official Assistant by Ritesh</p>
 </div>
 
-<div id="chat-area"></div>
+<div id="chat-window"></div>
+<div id="typing">Leo is thinking...</div>
 
-<div class="input-box">
+<div class="input-area">
     <input type="text" id="userInput" placeholder="Ask Leo something...">
-    <button onclick="send()">Send</button>
+    <button id="sendBtn">➔</button>
 </div>
 
 <script>
-    const chat = document.getElementById('chat-area');
-    const input = document.getElementById('userInput');
+    const chatWindow = document.getElementById('chat-window');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typing = document.getElementById('typing');
 
-    // --- LEO'S INDIAN VOICE ---
+    // Indian Female Voice
     function speak(text) {
         window.speechSynthesis.cancel();
-        const speech = new SpeechSynthesisUtterance(text);
+        const msg = new SpeechSynthesisUtterance(text);
         const voices = window.speechSynthesis.getVoices();
-        // Priority: Hindi Female Voice
-        const voice = voices.find(v => v.lang.includes('hi')) || voices.find(v => v.lang.includes('en-IN')) || voices[0];
-        speech.voice = voice;
-        speech.pitch = 1.2;
-        window.speechSynthesis.speak(speech);
+        const femaleIndian = voices.find(v => v.lang.includes('hi') || v.lang.includes('en-IN')) || voices[0];
+        msg.voice = femaleIndian;
+        msg.pitch = 1.2;
+        window.speechSynthesis.speak(msg);
     }
 
-    function addMessage(text, type) {
+    function addMessage(text, sender) {
         const div = document.createElement('div');
-        div.className = `bubble ${type}`;
+        div.className = `bubble ${sender === 'leo' ? 'leo-msg' : 'user-msg'}`;
         div.innerText = text;
-        chat.appendChild(div);
-        chat.scrollTop = chat.scrollHeight;
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // --- LEO'S SMART BRAIN (Local - No Internet API Needed) ---
-    function getResponse(userText) {
-: auto; display: flex; flex-direction: column; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc        let t = userText.toLowerCase();
-        
-        if (t.includes("hello") || t.includes("hi")) return "Hello! Mera naam Leo hai. Mujhe Ritesh ne banaya hai. How are you?";
-        if (t.includes("who made you") || t.includes("kaise banaya") || t.includes("ritesh")) return "0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: #0b141a; }
-        .bubble { max-width: 80%; padding: 12px; margin-bottom: 10px; border-radius: 10px; font-size: 16px; line-height: 1.4; position: relative; }
-        .leo { background-color: #202c33; align-self: flex-start; border-top-left-radius: 0; }
-        .user { background-color: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
-        .footer { display: flex; padding: 15px; background: #202c33;Mujhe Ritesh ne banaya hai. He is my creator and he is a genius!";
-        if (t.includes("kaise ho")) return "Main bilkul theek hoon! Aap bataiye, main aapki kya madad kar sakti hoon?";
-        if (t.includes("name")) return "Mera naam LEO hai. Mere creator Ritesh ne ye naam rakha hai.";
-        if (t.includes("weather")) return "I am not connected to a satellite right now, but I hope the weather is as beautiful as your day!";
-        if (t.includes("joke")) return "Why was the computer cold? Because it left its Windows open! Hahaha!";
-        if (t.includes("thank")) return "You're welcome! Leo is always here to help because Ritesh programmed me that }
-        input { flex: 1; padding: 12px; border: none; border-radius: 25px; outline: none; background: #2a3942; color: #fff; font-size: 16px; }
-        button { background: #00a884; color: white; border: none; width: 50px; height: 50px; border-radius: 50%; margin-left: 10px; cursor: pointer; font-size: 20px; }
-        #typing { color: #00a884; font-size: 12px; display: none; padding-left: 20px; padding-bottom: 5px; background: #0b141a; }
-    </style>
-</head>
-<body>
+    async function handleChat() {
+        const text = userInput.value.trim();
+        if (!text) return;
 
-<div class="header">
-    LEO AI
-    <span class=" way.";
-        
-        return "Mujhe Ritesh ne banaya hai aur main abhi seekh rahi hoon. Aap mujhse mere creator Ritesh ke baare mein kuch bhi pooch sakte hain!";
+        addMessage(text, 'user');
+        userInput.value = '';
+        typing.style.display = 'block';
+
+        try {
+            // Using a system instruction to make her smart
+            const api = `https://text.pollinations.ai/${encodeURIComponent(text)}?system=You are Leo, a smart girl assistant made by Ritesh. Be friendly and Indian.`;
+            const response = await fetch(api);
+            const data = await response.text();
+
+            typing.style.display = 'none';
+            addMessage(data, 'leo');
+            speak(data);
+        } catch (e) {
+            typing.style.display = 'none';
+            addMessage("Mujhe connectivity issue aa rahi hai. Par main theek hoon!", "leo");
+        }
     }
 
-    function send() {
-        const val = input.value.trim();
-        if (!val) return;
+    // Button Click
+    sendBtn.onclick = handleChat;
 
-        addMessage(val, 'user');
-        input.value = '';
+    // Enter Key
+    userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") handleChat();
+    });
 
-        setT
-            imeout(() => {
-            const reply = getResponse(val);
-            addMessage(reply, 'leo');
-            speak(reply);
-        }, 600);
-    }
-
-    // Startup
     window.onload = () => {
-        setTimeout(() => {
-            const intro = "Mujhe Ritesh ne banaya hai. I am Leo, your personal assistant. Aap kaise hain?";
-            addMessage(intro, 'leo');
-            speak(intro);
-        }, 1000);
+        const welcomeText = "Mujhe Ritesh ne banaya hai. I am Leo! Hello, how can I help you today?";
+        addMessage(welcomeText, 'leo');
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     };
-
-    input.addEventListener("keypress", (e) => { if(e.key === "Enter") send(); });
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-
 </script>
+
 </body>
 </html>
